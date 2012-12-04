@@ -235,6 +235,8 @@ class Entity(object):
         screen.blit(ammo_surf, ammo_rect)
         mana_back_rect = pygame.draw.rect(screen, (0, 0, 0), (screen_size[1]/50 + (screen_size[0]/800) * ((self.weapon.clipSize * 100)/self.weapon.clipSize), screen_size[1]/50 + math.ceil((screen_size[0]/80.0)/2.0), (screen_size[0]/800) * (((ammo - self.weapon.clipSize) * 100)/self.weapon.clipSize), math.ceil(screen_size[0]/80.0)/2.0))
 
+
+
         #try:
         #    mana_rect = pygame.draw.rect(screen, self.setImg("images/ammobelt.jpg"), (screen_size[1]/50, screen_size[1]/50 + math.ceil((screen_size[0]/80.0)/2.0), (screen_size[0]/800) * ((ammo *100)/self.weapon.clipSize), math.ceil((screen_size[0]/80.0)/2.0)))
         #except Exception as e:
@@ -596,13 +598,21 @@ class Zombie(Entity):
         else:
             return 0
 
+    def moveCheck(self, playerPosition, objectPosition):
+        if self.intersect(playerPosition, self.getPosition(),\
+                          objectPosition[0], objectPosition[1]):
+            return True
+        else:
+            return False
+
+
+
     def move(self, playerPosition, objectPosition):
         if self.intersect(playerPosition, self.getPosition(),\
                           objectPosition[0], objectPosition[1]):
             self.moveRandomAI()
         else:
             self.moveSmartAI(playerPosition)
-               
     def moveRandomAI(self):
         i = random.randrange(0,100)
         if(i<=10):
@@ -665,3 +675,21 @@ class Zombie(Entity):
     def intersect(self, A, B, C, D):
         return self.counterClockwiseOrder(A,C,D) != self.counterClockwiseOrder(B,C,D) and self.counterClockwiseOrder(A,B,C) != self.counterClockwiseOrder(A,B,D)
 ###############################################################################################
+
+
+class Object():
+    def __init__(self):
+        self.x = random.randrange(50,500)
+        self.y = random.randrange(50,500)
+        self.w = 10
+        self.h = 100
+        self.color = 10,10,10
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.color, (self.x, self.y, self.w, self.h), 0)
+        
+    def givePosition(self):
+        return ((self.x,self.y),(self.x+self.w, self.y+self.h))
+
+    def getRect(self):
+        return (self.x+15, self.y+15, self.w, self.h)
+

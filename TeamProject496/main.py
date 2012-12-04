@@ -40,7 +40,7 @@ def check_significant_keypresses(keys_pressed, window, player, items, fired, ene
                         items.extend([pickedUp])   
         elif keys_pressed[112] == 1:
             pauseMenu()
-            #window.set_background("images/field.jpg")
+            window.set_background("images/field.jpg")
         pygame.key.set_repeat(1, 1)
             
 """
@@ -63,6 +63,9 @@ def gameAndLogic():
     items = []
     z = []
     i = 0
+    obj = []
+    
+    
     MAXNUM = 1
     isPaused = False
     player = Player((window.SCREEN_WIDTH/2, window.SCREEN_HEIGHT/2)) # Init the player.
@@ -76,7 +79,23 @@ def gameAndLogic():
                 i += 1
             MAXNUM = MAXNUM * 2
             i = 0
-
+            
+    #Make the objects (walls) 
+            obj = []      
+            while i < 4:
+                obj.append(Object());
+                i +=1
+            i=0
+            
+            notOnPlayer = True
+            while notOnPlayer:
+                for o in obj:
+                    if player.collidesWith(o):
+                        o = Object()
+                        notOnPlayer = True
+                        break
+                    notOnPlayer = False
+                    
         #***********************************************************************
         # Keep stable frame rate.
         m_sec = clock.tick(140)
@@ -103,6 +122,10 @@ def gameAndLogic():
             if player.collidesWith(enemy):
                 player.x = lastx
                 player.y = lasty
+        for o in obj:
+            if player.collidesWith(o):
+                player.x = lastx
+                player.y = lasty
         hero_source, hero_destination = player.rotateTowardObject(pygame.mouse.get_pos())
         fired = player.weapon.shoot((window.SCREEN_WIDTH, window.SCREEN_HEIGHT),\
                                     (window.OLD_SCREEN_WIDTH, window.OLD_SCREEN_HEIGHT))
@@ -113,6 +136,8 @@ def gameAndLogic():
         #***********************************************************************
 
 
+
+        #New Movement
         px = player.x - window.SCREEN_WIDTH/2
         py = player.y - window.SCREEN_HEIGHT/2
         for item in items:
@@ -121,6 +146,9 @@ def gameAndLogic():
         for enemy in z:
             enemy.x -= px
             enemy.y -= py
+        for o in obj:
+            o.x -= px
+            o.y -= py
         player.x = window.SCREEN_WIDTH/2
         player.y = window.SCREEN_HEIGHT/2
 
@@ -141,19 +169,31 @@ def gameAndLogic():
                 items.remove(needsRemoved) 
         except Exception as e:
             print str(e) + " Item removal"
-            
+          
         try: # Draw dropped items that are on the map
             for item in items:
                 item_source, item_destination = item.img, item.getPosition()
                 window.draw(item_source, item_destination)
+                
         except Exception as e:
             print str(e) + " Item drawing"
             
+        
+        
         try:
             for enemy in z:
                 if not enemy.collidesWith(player):
                     enemy.notAttacking()
-                    enemy.move(player.getPosition(), ((-999,-999), (-999,-999)))
+                    
+                    moveZ = True
+                    for o in obj:
+                        if enemy.moveCheck(player.getPosition(), o.givePosition()):
+                           moveZ = False
+                           break
+                    for o in obj:
+                        if moveZ:
+                            enemy.move(player.getPosition(), o.givePosition())
+                            break 
                 else:
                     player.takeDamage(enemy.attack())
                 window.draw(enemy.rotateTowardObject(player))
@@ -196,6 +236,11 @@ def gameAndLogic():
             window.draw(mouse_c, setupCrossHairCursor().center)
         except Exception as e:
             pass
+        
+        #Draws Wall
+        for o in obj:
+            o.draw(window.SCREEN)
+        
         
         window.update()
 #************************************************************************
