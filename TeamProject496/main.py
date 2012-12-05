@@ -74,39 +74,44 @@ def gameAndLogic():
     
     
     MAXNUM = 1
-    speedIn = .1
+    speedIn = .5
     isPaused = False
     player = Player((window.SCREEN_WIDTH/2, window.SCREEN_HEIGHT/2)) # Init the player.
     weapons = [AssaultRifle, Handgun, Flamethrower, Sawshot] # List of weapons we want in the game.
     window.set_background("images/field.jpg")
     quitGame = False
     while player.isAlive():
-        if len(z) == 0:
-            while i < MAXNUM:
-                z.append(Zombie((random.randrange(0,window.SCREEN_WIDTH),random.randrange(0,window.SCREEN_HEIGHT))))
-                i += 1
-                
-            if MAXNUM < 16:
-                MAXNUM = MAXNUM * 2
-          
-            i = 0
-            
-    #Make the objects (walls) 
-            obj = []      
-            while i < 4:
-                obj.append(Object());
-                i +=1
-            i=0
-            
-            notOnPlayer = True
-            while notOnPlayer:
-                for o in obj:
-                    if player.collidesWith(o):
-                        o = Object()
-                        notOnPlayer = True
-                        break
-                    notOnPlayer = False
+        try:
+            if len(z) == 0:
+                while i < MAXNUM:
+                    z.append(Zombie((random.randrange(0,window.SCREEN_WIDTH),random.randrange(0,window.SCREEN_HEIGHT))))
+                    i += 1
                     
+                if MAXNUM < 16:
+                    MAXNUM = MAXNUM * 2
+                else:
+                    for enemy in z:
+                        enemy.move_speed_xy = enemy.move_speed_xy[0]+speedIn, enemy.move_speed_xy[1]+speedIn
+                        speedIn += .01
+                i = 0
+                
+        #Make the objects (walls) 
+                obj = []      
+                while i < 4:
+                    obj.append(Object());
+                    i +=1
+                i=0
+                
+                
+                for o in obj:
+                        if player.collidesWith(o):
+                            obj.remove(o)
+                
+                
+                
+               
+        except Exception as e:
+            print str(e) + " New LvL"    
         #***********************************************************************
         # Keep stable frame rate.
         m_sec = clock.tick(140)
@@ -147,22 +152,23 @@ def gameAndLogic():
         #***********************************************************************
 
 
-
-        #New Movement
-        px = player.x - window.SCREEN_WIDTH/2
-        py = player.y - window.SCREEN_HEIGHT/2
-        for item in items:
-            item.x -= px
-            item.y -= py
-        for enemy in z:
-            enemy.x -= px
-            enemy.y -= py
-        for o in obj:
-            o.x -= px
-            o.y -= py
-        player.x = window.SCREEN_WIDTH/2
-        player.y = window.SCREEN_HEIGHT/2
-
+        try:
+            #New Movement
+            px = player.x - window.SCREEN_WIDTH/2
+            py = player.y - window.SCREEN_HEIGHT/2
+            for item in items:
+                item.x -= px
+                item.y -= py
+            for enemy in z:
+                enemy.x -= px
+                enemy.y -= py
+            for o in obj:
+                o.x -= px
+                o.y -= py
+            player.x = window.SCREEN_WIDTH/2
+            player.y = window.SCREEN_HEIGHT/2
+        except Exception as e:
+            print str(e) + " New Movement"
 
 
 
@@ -247,11 +253,12 @@ def gameAndLogic():
             window.draw(mouse_c, setupCrossHairCursor().center)
         except Exception as e:
             pass
-        
-        #Draws Wall
-        for o in obj:
-            o.draw(window.SCREEN)
-        
+        try:
+            #Draws Wall
+            for o in obj:
+                o.draw(window.SCREEN)
+        except Exception as e:
+            print str(e) + " Print Walls"
         
         window.update()
 #************************************************************************
