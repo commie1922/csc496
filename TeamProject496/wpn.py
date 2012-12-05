@@ -267,22 +267,29 @@ class Entity(object):
 
     def getRect(self):
         return self.img.get_rect(x = self.x, y = self.y)    
-
+        
     def drop(self, obj = None):
-        if not obj == None:
-            return obj
-        else:
-            randRange = random.randrange(0,100)
-            if randRange <= 25:                
-                return Handgun((self.x, self.y))
-            elif randRange > 25 and randRange <= 50:
-                return AssaultRifle((self.x, self.y))
-            elif randRange > 50 and randRange <= 75:
-                return Sawshot((self.x, self.y))
-            elif randRange > 75 and randRange <= 100:
-                return Flamethrower((self.x, self.y))
-            elif randRange > 95:
-                return Handgun((self.x, self.y))
+        try:
+            if not obj == None:
+                return obj
+            else:
+                randRange = random.randrange(0,100)
+                if randRange > 20 and randRange <= 40:                
+                    return AmmoBag((self.x, self.y))
+                elif randRange > 40 and randRange <= 60:
+                    return Handgun((self.x, self.y))
+                elif randRange > 60 and randRange <= 75:
+                    return AssaultRifle((self.x, self.y))
+                elif randRange > 75 and randRange <= 85:
+                    return Sawshot((self.x, self.y))
+                elif randRange > 85 and randRange <= 90:                     
+                    return Flamethrower((self.x, self.y))
+                elif randRange > 95 and randRange <= 100:
+                    return HealthKit((self.x, self.y))
+                else:
+                    return None
+        except Exception as e:
+            print e
 ###############################################################################################
         
 ##########################################  Weapon  ###########################################
@@ -555,16 +562,47 @@ class Player(Entity):
         self.mana = self.weapon.currClip
 
     def pickUp(self, obj):
-        classType = obj.__class__.__bases__[0].__name__
-        if classType == 'Weapon':
-            self.maxMana = obj.clipSize
-            temp = self.weapon
-            obj.activeRounds = self.weapon.activeRounds
-            self.weapon = obj
-            return temp
-        else:
-            return None
-            
+        try:
+            classType = obj.__class__.__bases__[0].__name__
+            if classType == 'Weapon':
+                self.maxMana = obj.clipSize
+                temp = self.weapon
+                obj.activeRounds = self.weapon.activeRounds
+                self.weapon = obj
+                return temp
+            else:
+                return None
+        except Exception as e:
+            pass
+        
+    def grab(self, obj):
+        removeItem = False
+        try:
+            if self.weapon.__class__.__name__ == obj.__class__.__name__:
+                ammo = random.randrange(0, obj.currClip)
+                if self.weapon.ammo == self.weapon.max_ammo:
+                    print self.weapon.ammo, self.weapon.max_ammo
+                elif self.weapon.ammo + ammo > self.weapon.max_ammo:
+                    self.weapon.ammo = self.weapon.max_ammo
+                    removeItem = True
+                else:
+                    self.weapon.ammo += ammo
+                    removeItem = True
+            if obj.__class__.__name__ == 'HealthKit':
+                if self.health + obj.health > self.maxHealth:
+                    self.health = self.maxHealth
+                else:
+                    self.health += obj.health
+                removeItem = True
+            if obj.__class__.__name__ == 'AmmoBag':
+                if self.weapon.ammo + obj.ammo > self.weapon.max_ammo:
+                    self.weapon.ammo = self.weapon.max_ammo
+                else:
+                    self.weapon.ammo += obj.ammo
+                removeItem = True
+            return removeItem
+        except Exception as e:
+            pass
         
     def getAttributes(self):
         print "Weapon     : " + str(self.weapon)
@@ -585,7 +623,7 @@ class Zombie(Entity):
         self.weapon = ZombieHands((self.x, self.y))
         self.dmgMultiplier = 0
         self.attackTime = 60
-
+            
     def notAttacking(self):
         self.attackTime = 60
 
@@ -675,21 +713,39 @@ class Zombie(Entity):
     def intersect(self, A, B, C, D):
         return self.counterClockwiseOrder(A,C,D) != self.counterClockwiseOrder(B,C,D) and self.counterClockwiseOrder(A,B,C) != self.counterClockwiseOrder(A,B,D)
 ###############################################################################################
+class Misc(Entity):
+    def __init__(self, img, coordinates, size):
+        print coordinates
+        super(Misc, self).__init__(img,\
+                                     coordinates,\
+                                     None,\
+                                     0,\
+                                     size,\
+                                     None,\
+                                     None,\
+                                     None)
 
-
-class Object():
+class HealthKit(Misc):
+    def __init__(self, coordinates):
+        super(HealthKit, self).__init__("images/medkit.png",\
+                                   coordinates,\
+                                   (25,25))
+        self.health = random.randrange(10, 50)
+        
+class AmmoBag(Misc):
+    def __init__(self, coordinates):
+        super(AmmoBag, self).__init__("images/ammobag.png",\
+                                   coordinates,\
+                                   (25,25))
+        self.ammo = random.randrange(10, 50)
+        
+class Object(Misc):
     def __init__(self):
-        self.x = random.randrange(50,500)
-        self.y = random.randrange(50,500)
-        self.w = 10
-        self.h = 100
-        self.color = 10,10,10
-    def draw(self, screen):
-        pygame.draw.rect(screen, self.color, (self.x, self.y, self.w, self.h), 0)
+        x = random.randrange(50,500)
+        y = random.randrange(50,500)
+        super(Object, self).__init__((10,10,10),\
+                                   (x, y),\
+                                   (10, 100))
         
     def givePosition(self):
-        return ((self.x,self.y),(self.x+self.w, self.y+self.h))
-
-    def getRect(self):
-        return (self.x+15, self.y+15, self.w, self.h)
-
+        return ((self.x,self.y),(self.x + self.width, self.y + self.height))
