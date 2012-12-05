@@ -83,14 +83,13 @@ def gameAndLogic():
     items = []
     z = []
     i = 0
-<<<<<<< HEAD
     obj = []
     
     
-=======
+
     global SCORE
     global prevSCORES
->>>>>>> d136c837599164b6c8b896a1fee7cf3808922237
+
     MAXNUM = 1
     speedIn = .5
     isPaused = False
