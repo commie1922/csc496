@@ -660,8 +660,8 @@ class Zombie(Entity):
             self.move_speed_xy = self.moveSpeedTemp
             self.dmgMultiplier = 0
         else:
-            self.move_speed_xy = self.move_speed_xy[0] + .2,\
-                                 self.move_speed_xy[1] + .2
+            self.move_speed_xy = self.move_speed_xy[0] + .3,\
+                                 self.move_speed_xy[1] + .3
             self.dmgMultiplier = .5
     # Does not make case for where x and y speeds vary.  
     def becomeSpecial2(self):

@@ -11,6 +11,7 @@ from pygame.locals import *
 from image import *
 from menu import *
 
+
 os.environ['SDL_VIDEO_CENTERED'] = '1' # Center the game window.
 pygame.init()#Need to work this out, main should not need to know about pygame.
 
@@ -18,6 +19,12 @@ window = screen.Window(800, 600, "TeamProject 496", (0,0,0)) # Create game windo
 #window.set_font(((12, None), (24, None))) <- Another example of the two statements below
 window.set_font(12, None) # index 0
 window.set_font(24, None) # index 1
+
+#Music - DaftPunk
+pygame.mixer.init()
+pygame.mixer.music.load("music/end.ogg")
+pygame.mixer.music.play()
+
 
 mif = "images/cursor.png"
 pygame.mouse.set_visible(False)                  #hides the cursor so only the cross hair is seen
@@ -67,6 +74,7 @@ def gameAndLogic():
     
     
     MAXNUM = 1
+    speedIn = .1
     isPaused = False
     player = Player((window.SCREEN_WIDTH/2, window.SCREEN_HEIGHT/2)) # Init the player.
     weapons = [AssaultRifle, Handgun, Flamethrower, Sawshot] # List of weapons we want in the game.
@@ -77,7 +85,10 @@ def gameAndLogic():
             while i < MAXNUM:
                 z.append(Zombie((random.randrange(0,window.SCREEN_WIDTH),random.randrange(0,window.SCREEN_HEIGHT))))
                 i += 1
-            MAXNUM = MAXNUM * 2
+                
+            if MAXNUM < 16:
+                MAXNUM = MAXNUM * 2
+          
             i = 0
             
     #Make the objects (walls) 
