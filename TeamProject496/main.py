@@ -336,6 +336,8 @@ def pauseMenu():
                     window.full_screen()
                 else:                    
                     window.exit_full_screen(800,600)
+                window.draw_background()
+                pygame.event.post(pygame.event.Event(EVENT_CHANGE_STATE, key = 0))
                 state = 0
             elif state == 4:
                 state = 0
