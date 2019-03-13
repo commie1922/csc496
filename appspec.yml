@@ -3,12 +3,3 @@ os: windows
 files:
   - source: \
     destination: c:\temp\deployments
-hooks:
-  BeforeInstall:
-    - location: C:\scripts\script.bat
-  AfterInstall:
-    - location: C:\scripts\script.bat
-  ApplicationStart:
-    - location: C:\scripts\script.bat
-  ApplicationStop:
-    - location: C:\scripts\script.bat
