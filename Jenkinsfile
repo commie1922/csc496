@@ -1,10 +1,9 @@
 pipeline {
-    agent any
-    
+    agent { docker { image 'python:2.7.11' } }
     stages {
         stage('build') {
             steps {
-                sh 'python2 --version'
+                sh 'python --version'
             }
         }
     }
