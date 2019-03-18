@@ -7,6 +7,7 @@ pipeline {
           steps {
             retry(count: 3) {
               bat 'python --version'
+              bat 'python -compileall TeamProject496/'
             }
 
             timeout(time: 3, unit: 'MINUTES') {
